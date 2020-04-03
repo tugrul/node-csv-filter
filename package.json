@@ -1,0 +1,27 @@
+{
+  "name": "csv-filter",
+  "version": "0.0.1",
+  "description": "Redact CSV stream lines",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tugrul/node-csv-filter.git"
+  },
+  "keywords": [
+    "csv",
+    "filter"
+  ],
+  "author": "Tuğrul Topuz <tugrultopuz@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tugrul/node-csv-filter/issues"
+  },
+  "homepage": "https://github.com/tugrul/node-csv-filter#readme",
+  "devDependencies": {
+    "aline": "^0.0.4",
+    "mocha": "^7.1.1"
+  }
+}
