@@ -48,6 +48,10 @@ class CsvFilter extends Transform {
                 cols.push(part);
             });
 
+            if (cols.length === 0) {
+                continue;
+            }
+
             lines.push(Buffer.concat(cols));
             lines.push(newLine);
         }
