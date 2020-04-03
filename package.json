@@ -1,5 +1,5 @@
 {
-  "name": "csv-filter",
+  "name": "csvf",
   "version": "0.0.1",
   "description": "Redact CSV stream lines",
   "main": "index.js",

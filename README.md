@@ -7,13 +7,13 @@ Redact or modify CSV data streams
 ### NPM
 
 ```
-npm install csv-filter
+npm install csvf
 ```
 
 ### Yarn
 
 ```
-yarn add csv-filter
+yarn add csvf
 ```
 
 ## Options
@@ -32,7 +32,7 @@ yarn add csv-filter
 const assert = require('assert');
 const Aline = require('aline');
 const {Readable} = require('stream');
-const CsvFilter = require('csv-filter');
+const CsvFilter = require('csvf');
 
 async function* generate() {
     yield 'foo,bar,baz\nraz,naz,';
