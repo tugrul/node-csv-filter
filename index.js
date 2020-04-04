@@ -43,14 +43,16 @@ class CsvFilter extends Transform {
                 parts.push(chunk);
             }
 
+            if (cols.length === 0) {
+                continue;
+            }
+
             this._filter(parts).forEach((part, index) => {
                 index > 0 && cols.push(delimiter);
                 cols.push(part);
             });
 
-            if (cols.length === 0) {
-                continue;
-            }
+
 
             lines.push(Buffer.concat(cols));
             lines.push(newLine);
