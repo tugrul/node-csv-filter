@@ -43,7 +43,7 @@ class CsvFilter extends Transform {
                 parts.push(chunk);
             }
 
-            if (cols.length === 0) {
+            if (parts.length === 0) {
                 continue;
             }
 
