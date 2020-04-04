@@ -40,11 +40,11 @@ async function* generate() {
     yield 'pos,nos'
 }
 
-const target = Buffer.from('foo,BAR,baz\nraz,NAZ,kaz\nyaz,BOZ,haz\nhos,POS,nos\n');
+const actual = 'foo,BAR,baz\nraz,NAZ,kaz\nyaz,BOZ,haz\nhos,POS,nos\n';
 
 combineData(Readable.from(generate())
     .pipe(new Aline())
     .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, Buffer.from(col2.toString().toUpperCase()), col3]})))
-    .then(actual => assert.equal(0, target.compare(actual)));
+    .then(expected => assert.equal(actual, expected.toString()));
 
 ```
