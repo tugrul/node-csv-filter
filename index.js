@@ -22,25 +22,28 @@ class CsvFilter extends Transform {
 
         const lines = [];
 
-        while (index > -1) {
+        while (index > -1 && index < chunk.length - 1) {
             const parts = [];
             const cols = [];
             const prevIndex = index;
-            index = chunk.indexOf(this._newLine, index + 1);
+            index = chunk.indexOf(this._newLine, index);
+
+            const line = chunk.slice(prevIndex, index > -1 ? index++ : chunk.length);
 
             if (this._skipFirstLine) {
                 this._skipFirstLine = false;
                 continue;
             }
 
-            const line = chunk.slice(prevIndex > 0 ? prevIndex + 1 : 0, index > -1 ? index : chunk.length);
             let col = 0;
 
             while (col > -1) {
                 const colIndex = col;
-                col = line.indexOf(this._delimiter, col + 1);
-                const chunk = line.slice(colIndex > 0 ? colIndex + 1 : 0, col > -1 ? col : line.length);
+                col = line.indexOf(this._delimiter, col);
+
+                const chunk = line.slice(colIndex, col > -1 ? col++ : line.length);
                 parts.push(chunk);
+
             }
 
             if (parts.length === 0) {

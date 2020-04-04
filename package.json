@@ -1,6 +1,6 @@
 {
   "name": "csvf",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Redact CSV stream lines",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/tugrul/node-csv-filter#readme",
   "devDependencies": {
-    "aline": "^0.0.4",
+    "aline": "^0.0.5",
     "mocha": "^7.1.1"
   }
 }
