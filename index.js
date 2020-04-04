@@ -22,6 +22,8 @@ class CsvFilter extends Transform {
 
         const lines = [];
 
+        this.pause();
+
         while (index > -1 && index < chunk.length - 1) {
             const parts = [];
             const cols = [];
@@ -60,6 +62,8 @@ class CsvFilter extends Transform {
             lines.push(Buffer.concat(cols));
             lines.push(newLine);
         }
+
+        this.resume();
 
         callback(null, Buffer.concat(lines));
     }
