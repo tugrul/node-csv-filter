@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-aline@0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/aline/-/aline-0.0.5.tgz#609e07ec42cfcc31a8d17147e79baa24f8d7ba72"
-  integrity sha512-EeMMwS9hXMIACeEK37X3NScCeNHLAHMDM1FIl+2d3EWcg27nGpHRRTqzhlbA3LE0hdq5ItqSlkBFrLeVCSflGw==
+aline@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/aline/-/aline-0.0.6.tgz#0267131dc261ee569626bfb27f28b275e6af4bd1"
+  integrity sha512-0uPIFMru82IIxYL3uHgQjCq5CEiEj3LCCncPKUMPAdx/T08x5WDfG6GLrstQG1U5O8wxqzsw+8fSqr4SdzChuw==
 
 ansi-colors@3.2.3:
   version "3.2.3"
