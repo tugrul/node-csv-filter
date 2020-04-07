@@ -123,3 +123,21 @@ it('should not omit empty columns', async () => {
     assert.equal(actual, expected.toString());
 
 });
+
+it('should skip first line', async () => {
+
+    async function* generate() {
+        yield ',,\n,naz,';
+        yield 'kaz\nyaz,,haz\nhos,';
+        yield 'pos,'
+    }
+
+    const actual = ',naz,kaz\nyaz,,haz\nhos,pos,\n';
+
+    const expected = await combineData(Readable.from(generate())
+        .pipe(new Aline())
+        .pipe(new CsvFilter({delimiter: ',', skipFirstLine: true})));
+
+    assert.equal(actual, expected.toString());
+
+});
