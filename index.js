@@ -50,7 +50,7 @@ class CsvFilter extends Transform {
                 continue;
             }
 
-            this._filter(parts).forEach((part, index) => {
+            this._filter(parts, chunk).forEach((part, index) => {
                 index > 0 && cols.push(delimiter);
                 cols.push(part);
             });
