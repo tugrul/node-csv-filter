@@ -16,12 +16,14 @@
   ],
   "author": "Tuğrul Topuz <tugrultopuz@gmail.com>",
   "license": "MIT",
+  "typings": "./index.d.ts",
   "bugs": {
     "url": "https://github.com/tugrul/node-csv-filter/issues"
   },
   "homepage": "https://github.com/tugrul/node-csv-filter#readme",
   "devDependencies": {
-    "aline": "^0.0.6",
-    "mocha": "^7.1.1"
+    "aline": "^0.0.8",
+    "mocha": "^7.1.1",
+    "@types/node": "^13.11.0"
   }
 }
