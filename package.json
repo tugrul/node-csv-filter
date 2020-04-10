@@ -1,6 +1,6 @@
 {
   "name": "csvf",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Redact CSV stream lines",
   "main": "index.js",
   "scripts": {
