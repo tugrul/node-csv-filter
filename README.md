@@ -28,7 +28,6 @@ yarn add csvf
 
 ## Sample
 ```javascript
-
 const assert = require('assert');
 const Aline = require('aline');
 const {Readable} = require('stream');
@@ -56,7 +55,32 @@ combineData(Readable.from(generate())
     .pipe(new Aline())
     .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, Buffer.from(col2.toString().toUpperCase()), col3]})))
     .then(expected => assert.equal(actual, expected.toString()));
+```
 
+## Real World Sample
+```javascript
+const fs = require('fs');
+const zlib = require('zlib');
+const {pipeline} = require('stream');
+const Aline = require('aline');
+const CsvFilter = require('csvf');
 
-
+pipeline(
+    fs.createReadStream('huge.csv.gz'), 
+    zlib.createGunzip(), 
+    new Aline(), 
+    new CsvFilter({
+        // remove rows with empty columns
+        filter: cols => cols.filter(col => col.length > 0).length === cols.length ? cols : null
+    }),
+    zlib.createGzip(),
+    fs.createWriteStream('huge_updated.csv.gz'), 
+    (err) => {
+        if (err) {
+          console.error('Pipeline failed.', err);
+        } else {
+          console.log('Pipeline succeeded.');
+        }
+    }
+);
 ```
