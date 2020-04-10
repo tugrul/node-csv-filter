@@ -161,3 +161,44 @@ it('should skip rows if it has a lost column', async() => {
 
 });
 
+it('should pick first column', async () => {
+
+    async function* generate() {
+        yield 'foo,bar,baz\nraz,naz,';
+        yield 'kaz\nyaz,boz,haz\nhos,';
+        yield 'pos,nos'
+    }
+
+    const actual = 'foo\nraz\nyaz\nhos\n';
+
+    const expected = await combineData(Readable.from(generate())
+        .pipe(new Aline())
+        .pipe(new CsvFilter({filter: ([col1]) => col1})));
+
+    assert.equal(actual, expected.toString());
+
+});
+
+it('should convert to json', async () => {
+
+    async function* generate() {
+        yield 'foo,bar,baz\nraz,naz,';
+        yield 'kaz\nyaz,boz,haz\nhos,';
+        yield 'pos,nos'
+    }
+
+    const actual = [
+        '{"firstName":"foo","lastName":"bar"}',
+        '{"firstName":"raz","lastName":"naz"}',
+        '{"firstName":"yaz","lastName":"boz"}',
+        '{"firstName":"hos","lastName":"pos"}',
+        ''
+    ].join('\n');
+
+    const expected = await combineData(Readable.from(generate())
+        .pipe(new Aline())
+        .pipe(new CsvFilter({filter: ([col1, col2]) => JSON.stringify({firstName: col1.toString(), lastName: col2.toString()})})));
+
+    assert.equal(actual, expected.toString());
+
+});

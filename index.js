@@ -24,7 +24,6 @@ class CsvFilter extends Transform {
 
         while (index > -1 && index < chunk.length - 1) {
             const parts = [];
-            const cols = [];
             const prevIndex = index;
             index = chunk.indexOf(this._newLine, index);
 
@@ -48,21 +47,35 @@ class CsvFilter extends Transform {
                 continue;
             }
 
-            const filteredParts = this._filter(parts, chunk);
+            let targetLine = this._filter(parts, chunk);
 
-            // skip line if callback return not array
-            if (!(filteredParts && filteredParts instanceof Array)) {
+            // skip line if callback return undefined
+            if (!targetLine) {
                 continue;
             }
 
-            // seperate columns with column seperator character
-            filteredParts.forEach((part, index) => {
-                index > 0 && cols.push(delimiter);
-                cols.push(part);
-            });
+            switch (typeof targetLine) {
+                case 'object':
+                    if (targetLine instanceof Array) {
+                        const cols = [];
+
+                        // seperate columns with column seperator character
+                        targetLine.forEach((part, index) => {
+                            index > 0 && cols.push(delimiter);
+                            cols.push(part);
+                        });
+
+                        targetLine = Buffer.concat(cols);
+                    } else if (!Buffer.isBuffer(targetLine)) {
+                        continue;
+                    }
+                    break;
+                case 'string': targetLine = Buffer.from(targetLine); break;
+                default: continue;
+            }
 
             // combine new columns
-            lines.push(Buffer.concat(cols));
+            lines.push(targetLine);
             lines.push(newLine);
         }
 
