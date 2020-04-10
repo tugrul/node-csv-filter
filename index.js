@@ -40,27 +40,33 @@ class CsvFilter extends Transform {
             while (col > -1) {
                 const colIndex = col;
                 col = line.indexOf(this._delimiter, col);
-
-                const chunk = line.slice(colIndex, col > -1 ? col++ : line.length);
-                parts.push(chunk);
-
+                parts.push(line.slice(colIndex, col > -1 ? col++ : line.length));
             }
 
+            // skip line if it doesn't have csv column
             if (parts.length === 0) {
                 continue;
             }
 
-            this._filter(parts, chunk).forEach((part, index) => {
+            const filteredParts = this._filter(parts, chunk);
+
+            // skip line if callback return not array
+            if (!(filteredParts && filteredParts instanceof Array)) {
+                continue;
+            }
+
+            // seperate columns with column seperator character
+            filteredParts.forEach((part, index) => {
                 index > 0 && cols.push(delimiter);
                 cols.push(part);
             });
 
-
-
+            // combine new columns
             lines.push(Buffer.concat(cols));
             lines.push(newLine);
         }
 
+        // combine new rows and give back to transform
         callback(null, Buffer.concat(lines));
     }
 

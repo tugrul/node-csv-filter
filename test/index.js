@@ -141,3 +141,23 @@ it('should skip first line', async () => {
     assert.equal(actual, expected.toString());
 
 });
+
+it('should skip rows if it has a lost column', async() => {
+
+    async function* generate() {
+        yield ',,\n,naz,';
+        yield 'kaz\nyaz,,haz\nbim,bam,bom\nhos,';
+        yield 'pos,\nbom,bim,bam';
+    }
+
+    const actual = 'bim,bam,bom\nbom,bim,bam\n';
+
+    const expected = await combineData(Readable.from(generate())
+        .pipe(new Aline())
+        .pipe(new CsvFilter({delimiter: ',',
+            filter: cols => cols.filter(col => col.length > 0).length === cols.length ? cols : null})));
+
+    assert.equal(actual, expected.toString());
+
+});
+
