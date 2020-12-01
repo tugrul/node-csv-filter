@@ -29,7 +29,7 @@ it('should transform LF to CRLF', async () => {
         .pipe(new Aline({separator: '|'}))
         .pipe(new CsvFilter({newLine: '|', targetNewLine: '#'})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -47,7 +47,7 @@ it('should transform comma to column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({delimiter: ',', targetDelimiter: ';'})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -65,7 +65,7 @@ it('should remove 2nd column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, col3]})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual.toString(), expected.toString());
 
 });
 
@@ -83,7 +83,7 @@ it('should uppercase 2nd column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, Buffer.from(col2.toString().toUpperCase()), col3]})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -102,7 +102,7 @@ it('should remove last character of 2nd column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, col2.slice(0, 2), col3]})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -120,7 +120,7 @@ it('should not omit empty columns', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({delimiter: ',', targetDelimiter: ';'})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -138,7 +138,7 @@ it('should skip first line', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({delimiter: ',', skipFirstLine: true})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -157,7 +157,7 @@ it('should skip rows if it has a lost column', async() => {
         .pipe(new CsvFilter({delimiter: ',',
             filter: cols => cols.filter(col => col.length > 0).length === cols.length ? cols : null})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -175,7 +175,7 @@ it('should pick first column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1]) => col1})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
 
@@ -199,6 +199,6 @@ it('should convert to json', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2]) => JSON.stringify({firstName: col1.toString(), lastName: col2.toString()})})));
 
-    assert.equal(actual, expected.toString());
+    assert.strictEqual(actual, expected.toString());
 
 });
