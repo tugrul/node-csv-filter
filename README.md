@@ -24,6 +24,7 @@ yarn add csvf
 - `targetNewLine`: new line character of CSV stream after the filter.  `\n` `\r\n`
 - `skipFirstLine`: remove the first header row of CSV stream after the filter
 - `filter`: callback to redact or modify row of CSV stream. `([col1, col2, col3]) => [col1, col3]`
+- `objectMode`: pump parsed fragment instead of string fragment. `true` `false`
 
 
 ## Sample

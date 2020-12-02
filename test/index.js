@@ -4,13 +4,13 @@ const Aline = require('aline');
 const {Readable} = require('stream');
 const CsvFilter = require('../index');
 
-function combineData(stream) {
+function combineData(stream, objectMode = false) {
     return new Promise((resolve, reject) => {
 
         const chunks = [];
 
         stream.on('data', data => chunks.push(data));
-        stream.on('end', () => resolve(Buffer.concat(chunks)));
+        stream.on('end', () => resolve(objectMode ? chunks : Buffer.concat(chunks)));
         stream.on('error', err => reject(err));
     });
 }
@@ -200,5 +200,27 @@ it('should convert to json', async () => {
         .pipe(new CsvFilter({filter: ([col1, col2]) => JSON.stringify({firstName: col1.toString(), lastName: col2.toString()})})));
 
     assert.strictEqual(actual, expected.toString());
+
+});
+
+it('should parse end emit object', async () => {
+
+    async function* generate() {
+        yield 'foo,bar,baz\nraz,naz,';
+        yield 'kaz\nyaz,boz,haz\nhos,';
+        yield 'pos,nos'
+    }
+
+    const actual = [
+        [ [ 'foo', 'bar', 'baz' ] ],
+        [ [ 'raz', 'naz', 'kaz' ], [ 'yaz', 'boz', 'haz' ] ],
+        [ [ 'hos', 'pos', 'nos' ] ]
+    ];
+
+    const expected = await combineData(Readable.from(generate())
+        .pipe(new Aline())
+        .pipe(new CsvFilter({objectMode: true})), true);
+
+    assert.deepStrictEqual(actual, expected);
 
 });

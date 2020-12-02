@@ -7,11 +7,12 @@ export default class CsvFilter extends Transform {
 
 declare namespace CsvFilter {
     export interface CsvFilterOptions {
+        objectMode?: boolean,
         delimiter?: string,
         newLine?: string,
         targetDelimiter?: string,
         targetNewLine?: string
         skipFirstLine?: boolean,
-        filter?: (cols: Buffer[], chunk: Buffer) => Buffer[]
+        filter?: (cols: Buffer[], chunk: Buffer) => Buffer[] | Object
     }
 }

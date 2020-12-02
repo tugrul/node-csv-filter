@@ -4,7 +4,8 @@ const {Transform} = require('stream');
 class CsvFilter extends Transform {
 
     constructor(options) {
-        super();
+        super({objectMode: options.objectMode || false});
+        this._objectMode = options.objectMode || false;
         this._delimiter = options.delimiter || ',';
         this._newLine = options.newLine || '\n';
         this._targetDelimiter = options.targetDelimiter || this._delimiter;
@@ -61,26 +62,30 @@ class CsvFilter extends Transform {
 
                         // seperate columns with column seperator character
                         targetLine.forEach((part, index) => {
-                            index > 0 && cols.push(delimiter);
-                            cols.push(part);
+                            if (this._objectMode) {
+                                cols.push(part.toString());
+                            } else {
+                                index > 0 && cols.push(delimiter);
+                                cols.push(part);
+                            }
                         });
 
-                        targetLine = Buffer.concat(cols);
+                        targetLine = this._objectMode ? cols : Buffer.concat(cols);
                     } else if (!Buffer.isBuffer(targetLine)) {
                         continue;
                     }
                     break;
-                case 'string': targetLine = Buffer.from(targetLine); break;
+                case 'string': targetLine = this._objectMode ? [targetLine] : Buffer.from(targetLine); break;
                 default: continue;
             }
 
             // combine new columns
             lines.push(targetLine);
-            lines.push(newLine);
+            !this._objectMode && lines.push(newLine);
         }
 
         // combine new rows and give back to transform
-        callback(null, Buffer.concat(lines));
+        callback(null, this._objectMode ? lines : Buffer.concat(lines));
     }
 
 }
