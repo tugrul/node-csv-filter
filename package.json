@@ -1,10 +1,15 @@
 {
   "name": "csvf",
-  "version": "0.0.12",
+  "version": "1.0.0",
   "description": "Redact CSV stream lines",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=v20.0.0"
+  },
   "scripts": {
-    "test": "mocha"
+    "test": "jest",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -16,14 +21,16 @@
   ],
   "author": "Tuğrul Topuz <tugrultopuz@gmail.com>",
   "license": "MIT",
-  "types": "./index.d.ts",
   "bugs": {
     "url": "https://github.com/tugrul/node-csv-filter/issues"
   },
   "homepage": "https://github.com/tugrul/node-csv-filter#readme",
   "devDependencies": {
-    "@types/node": "^14.14.10",
-    "aline": "^0.0.8",
-    "mocha": "^7.1.1"
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.2",
+    "aline": "^1.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2"
   }
 }

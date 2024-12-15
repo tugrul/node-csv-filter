@@ -1,21 +1,22 @@
 
-const assert = require('assert');
-const Aline = require('aline');
-const {Readable} = require('stream');
-const CsvFilter = require('../index');
 
-function combineData(stream, objectMode = false) {
+import { Aline } from 'aline';
+import { Readable, Transform } from 'node:stream';
+import CsvFilter from '.';
+
+
+function combineData<T extends Transform>(stream: T, objectMode: boolean = false): Promise<any> {
     return new Promise((resolve, reject) => {
 
-        const chunks = [];
+        const chunks: Array<string> = [];
 
         stream.on('data', data => chunks.push(data));
-        stream.on('end', () => resolve(objectMode ? chunks : Buffer.concat(chunks)));
+        stream.on('end', () => resolve(objectMode ? chunks : Buffer.concat(chunks.map(chunk => Buffer.from(chunk)))));
         stream.on('error', err => reject(err));
     });
 }
 
-it('should transform LF to CRLF', async () => {
+test('should transform LF to CRLF', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz|raz,naz,';
@@ -29,11 +30,12 @@ it('should transform LF to CRLF', async () => {
         .pipe(new Aline({separator: '|'}))
         .pipe(new CsvFilter({newLine: '|', targetNewLine: '#'})));
 
-    assert.strictEqual(actual, expected.toString());
+
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should transform comma to column', async () => {
+test('should transform comma to column', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -47,11 +49,11 @@ it('should transform comma to column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({delimiter: ',', targetDelimiter: ';'})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should remove 2nd column', async () => {
+test('should remove 2nd column', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -65,11 +67,11 @@ it('should remove 2nd column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, col3]})));
 
-    assert.strictEqual(actual.toString(), expected.toString());
+    expect(actual.toString()).toStrictEqual(expected.toString());
 
 });
 
-it('should uppercase 2nd column', async () => {
+test('should uppercase 2nd column', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -83,12 +85,12 @@ it('should uppercase 2nd column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, Buffer.from(col2.toString().toUpperCase()), col3]})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
 
-it('should remove last character of 2nd column', async () => {
+test('should remove last character of 2nd column', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -102,11 +104,11 @@ it('should remove last character of 2nd column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2, col3]) => [col1, col2.slice(0, 2), col3]})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should not omit empty columns', async () => {
+test('should not omit empty columns', async () => {
 
     async function* generate() {
         yield ',,\n,naz,';
@@ -120,11 +122,11 @@ it('should not omit empty columns', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({delimiter: ',', targetDelimiter: ';'})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should skip first line', async () => {
+test('should skip first line', async () => {
 
     async function* generate() {
         yield ',,\n,naz,';
@@ -138,11 +140,11 @@ it('should skip first line', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({delimiter: ',', skipFirstLine: true})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should skip rows if it has a lost column', async() => {
+test('should skip rows if it has a lost column', async() => {
 
     async function* generate() {
         yield ',,\n,naz,';
@@ -157,11 +159,11 @@ it('should skip rows if it has a lost column', async() => {
         .pipe(new CsvFilter({delimiter: ',',
             filter: cols => cols.filter(col => col.length > 0).length === cols.length ? cols : null})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should pick first column', async () => {
+test('should pick first column', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -175,11 +177,11 @@ it('should pick first column', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1]) => col1})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should convert to json', async () => {
+test('should convert to json', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -199,11 +201,11 @@ it('should convert to json', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({filter: ([col1, col2]) => JSON.stringify({firstName: col1.toString(), lastName: col2.toString()})})));
 
-    assert.strictEqual(actual, expected.toString());
+    expect(actual).toStrictEqual(expected.toString());
 
 });
 
-it('should parse end emit object', async () => {
+test('should parse end emit object', async () => {
 
     async function* generate() {
         yield 'foo,bar,baz\nraz,naz,';
@@ -221,6 +223,7 @@ it('should parse end emit object', async () => {
         .pipe(new Aline())
         .pipe(new CsvFilter({objectMode: true})), true);
 
-    assert.deepStrictEqual(actual, expected);
+
+    expect(actual).toStrictEqual(expected);
 
 });
