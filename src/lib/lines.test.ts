@@ -1,27 +1,61 @@
 
 import { getLines } from './lines';
 
-test('get parts by seperator', () => {
+describe('getLines', () => {
+    it('should yield lines split by a single-character separator', () => {
+        const chunk = Buffer.from('line1\nline2\nline3');
+        const separator = '\n';
+        const result = Array.from(getLines(chunk, separator));
+        expect(result).toEqual([
+            Buffer.from('line1'),
+            Buffer.from('line2'),
+            Buffer.from('line3'),
+        ]);
+    });
 
-    const lines = Array.from(getLines(Buffer.from('a,b,c'), ',')).map(line => line.toString());
+    it('should handle a multi-character separator', () => {
+        const chunk = Buffer.from('line1//line2//line3');
+        const separator = '//';
+        const result = Array.from(getLines(chunk, separator));
+        expect(result).toEqual([
+            Buffer.from('line1'),
+            Buffer.from('line2'),
+            Buffer.from('line3'),
+        ]);
+    });
 
-    expect(lines).toStrictEqual(['a', 'b', 'c']);
+    it('should yield the entire chunk if separator is not found', () => {
+        const chunk = Buffer.from('line1line2line3');
+        const separator = '\n';
+        const result = Array.from(getLines(chunk, separator));
+        expect(result).toEqual([Buffer.from('line1line2line3')]);
+    });
 
-});
+    it('should handle an empty chunk', () => {
+        const chunk = Buffer.from('');
+        const separator = '\n';
+        const result = Array.from(getLines(chunk, separator));
+        expect(result).toEqual([]);
+    });
 
-test('get parts by multi bytes seperator', () => {
+    it('should handle a trailing separator', () => {
+        const chunk = Buffer.from('line1\nline2\n');
+        const separator = '\n';
+        const result = Array.from(getLines(chunk, separator));
+        expect(result).toEqual([
+            Buffer.from('line1'),
+            Buffer.from('line2')
+        ]);
+    });
 
-    const lines = Array.from(getLines(Buffer.from('a<>b<>c'), '<>')).map(line => line.toString());
-
-    expect(lines).toStrictEqual(['a', 'b', 'c']);
-
-});
-
-
-test('test empty lines', () => {
-
-    const lines = Array.from(getLines(Buffer.from('a,b,c,,d,,,e'), ',')).map(line => line.toString());
-
-    expect(lines).toStrictEqual(['a', 'b', 'c', '', 'd', '', '', 'e']);
-
+    it('should handle leading separators', () => {
+        const chunk = Buffer.from('\nline1\nline2');
+        const separator = '\n';
+        const result = Array.from(getLines(chunk, separator));
+        expect(result).toEqual([
+            Buffer.from(''),
+            Buffer.from('line1'),
+            Buffer.from('line2'),
+        ]);
+    });
 });
