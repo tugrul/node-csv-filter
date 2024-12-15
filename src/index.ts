@@ -2,6 +2,9 @@
 import { Transform } from 'node:stream';
 import type { TransformCallback } from 'node:stream';
 
+import { getLines } from './lib/lines';
+import { parseLine } from './lib/csv';
+
 type CsvFilterCallbackReturnType = Array<Buffer> | string | Buffer | null;
 type CsvFilterCallback = (parts: Array<Buffer>, chunk: Buffer) => CsvFilterCallbackReturnType;
 
@@ -12,6 +15,7 @@ interface CsvFilterOptions {
     targetDelimiter?: string;
     targetNewLine?: string;
     skipFirstLine?: boolean;
+    quotes?: string;
     filter?: CsvFilterCallback
 }
 
@@ -23,10 +27,11 @@ export default class CsvFilter extends Transform {
     #newLine: string;
     #targetDelimiter: string;
     #targetNewLine: string;
+    #quotes: string;
     #filter: CsvFilterCallback;
 
     constructor({objectMode = false, delimiter = ',', newLine = '\n', skipFirstLine = false, 
-        filter = fields => fields, targetDelimiter, targetNewLine}: CsvFilterOptions) {
+        quotes = '"', filter = fields => fields, targetDelimiter, targetNewLine}: CsvFilterOptions) {
         super({objectMode});
         this.#objectMode = objectMode;
         this.#skipFirstLine = skipFirstLine;
@@ -34,39 +39,8 @@ export default class CsvFilter extends Transform {
         this.#newLine = newLine;
         this.#targetDelimiter = targetDelimiter || delimiter;
         this.#targetNewLine = targetNewLine || newLine;
+        this.#quotes = quotes;
         this.#filter = filter;
-        
-    }
-
-    *getLines(chunk: Buffer): Generator<Buffer, void, unknown> {
-
-        let index = 0;
-
-        while (index > -1 && index < chunk.length - 1) {
-            const prevIndex = index;
-            index = chunk.indexOf(this.#newLine, index);
-
-            if (this.#skipFirstLine) {
-                this.#skipFirstLine = false;
-                continue;
-            }
-
-            yield chunk.slice(prevIndex, index > -1 ? index++ : chunk.length);
-        }
-    }
-
-    parseColumnsByLine(line: Buffer): Array<Buffer> {
-        const parts: Array<Buffer> = [];
-
-        let col = 0;
-
-        while (col > -1) {
-            const colIndex = col;
-            col = line.indexOf(this.#delimiter, col);
-            parts.push(line.slice(colIndex, col > -1 ? col++ : line.length));
-        }
-
-        return parts;
     }
 
     _transform(chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) {
@@ -76,9 +50,17 @@ export default class CsvFilter extends Transform {
 
         const lines: Array<Buffer> = [];
 
-        for (const line of this.getLines(chunk)) {
+        const delimiterChar = this.#delimiter.charCodeAt(0);
+        const quoteChar = this.#quotes.charCodeAt(0);
 
-            const cols = this.parseColumnsByLine(line);
+        for (const line of getLines(chunk, this.#newLine)) {
+
+            if (this.#skipFirstLine) {
+                this.#skipFirstLine = false;
+                continue;
+            }
+
+            const cols = parseLine(line, delimiterChar, quoteChar);
 
             // skip line if it doesn't have csv column
             if (cols.length === 0) {
